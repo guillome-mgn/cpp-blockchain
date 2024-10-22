@@ -19,18 +19,17 @@ public:
     std::string hash;
 
     Block(int index, std::string data, std::string precedentHash):
-        index(index), 
-        data(data), 
-        precedentHash(precedentHash)
+        index(index), data(data), precedentHash(precedentHash)
         {
             hash = genererHash(index, data, precedentHash);
         }
 
     // Fonction pour vérifier l'intégrité du bloc
-    void verifierIntegriteBlock() {
+    bool verifierIntegriteBlock()
+    {
         std::string calculatedHash = genererHash(index, data, precedentHash);
 		bool integrite = calculatedHash == hash;
-		std::cout << "Integrite du bloc numero " << index << " : " << integrite << std::endl;
+        return integrite;
     }
 };
 
@@ -81,27 +80,28 @@ public:
 	}
 
     // Fonction pour vérifier l'integrite de la chaine
-    void verifierIntegriteChaine()
+    bool verifierIntegriteChaine()
     {
         bool integrite = true;
-
         for (int i = 1; i < chain.size(); ++i)
         {
             Block blockCourant = chain[i];
             Block precedentBlock = chain[i - 1];
-
+            
+			// Vérification de l'intégrité du bloc courant
             if (blockCourant.hash != genererHash(blockCourant.index, blockCourant.data, blockCourant.precedentHash))
             {
                 integrite = false;
             }
 
+			// Vérification de la continuité de la chaine
             if (blockCourant.precedentHash != precedentBlock.hash)
             {
                 integrite = false;
             }
         }
 
-        std::cout << "Integrite de la blockchain : " << integrite << std::endl;
+        return integrite;
     }
 };
 
@@ -112,12 +112,12 @@ int main()
     maBlockchain.ajouterBlock("Bloc 2");
     maBlockchain.ajouterBlock("Bloc 3");
     maBlockchain.afficherBlockchain();
-	maBlockchain.chain[1].verifierIntegriteBlock();
-	maBlockchain.verifierIntegriteChaine();
+    std::cout << "Integrite du bloc 1 : " << maBlockchain.chain[1].verifierIntegriteBlock() << std::endl;
+    std::cout << "Integrite de la blockchain : " << maBlockchain.verifierIntegriteChaine() << std::endl;
 
     // Test avec modification d'une data
 	maBlockchain.chain[1].data = "Bloc 1 modifie";
 	maBlockchain.afficherBlock(1);
-	maBlockchain.chain[1].verifierIntegriteBlock();
-	maBlockchain.verifierIntegriteChaine();
+    std::cout << "Integrite du bloc 1 : " << maBlockchain.chain[1].verifierIntegriteBlock() << std::endl;
+    std::cout << "Integrite de la blockchain : " << maBlockchain.verifierIntegriteChaine() << std::endl;
 }
